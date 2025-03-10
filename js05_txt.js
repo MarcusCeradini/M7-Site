@@ -43,6 +43,18 @@ function createLightbox(){
    lightBox.appendChild(lbPlay)
    lbPlay.id = "lbPlay"
    lbPlay.innerHTML = "&#9199;"
+   let timeID;
+   lbPlay.onclick = function(){
+      if (timeID) {
+         window.clearInterval(timeID);
+         timeID = undefined;
+      } else {
+         showNext()
+         timeID = window.setInterval(showNext, 1500);
+      }
+   }
+
+
 
    lightBox.appendChild(lbImages)
    lbImages.id = "lbImages"
@@ -51,7 +63,8 @@ function createLightbox(){
       let image = document.createElement("img")
       image.src = imgFiles[i];
       image.alt = imgCaptions[i];
-      lbImages.appendChild(image)
+      image.onclick = createOverlay;
+      lbImages.appendChild(image);
    }
 
    function showNext(){
@@ -65,6 +78,32 @@ function createLightbox(){
       (currentImg > 1) ? currentImg-- : currentImg = imgCount;
       lbCounter.textContent = currentImg + " / " + imgCount;
    }
+
+   function createOverlay(){
+      let overlay = document.createElement("div");
+      overlay.id = "lbOverlay";
+
+      let figureBox = document.createElement("figure");
+      overlay.appendChild(figureBox);
+
+      let overlayImage = this.cloneNode("true");
+      figureBox.appendChild(overlayImage);
+
+      let overlayCaption = document.createElement("figcaption");
+      overlayCaption.textContent = this.alt
+      figureBox.appendChild(overlayCaption);
+
+      let closeBox = document.createElement("div");
+      closeBox.id = "lbOverlayClose";
+      closeBox.innerHTML = "&times;";
+      closeBox.onclick = function() {
+         document.body.removeChild(overlay);
+      }
+      overlay.appendChild(closeBox);
+
+      document.body.appendChild(overlay);
+   }
+
 }
 
 window.addEventListener("load", setupGallery);
@@ -83,7 +122,7 @@ function setupGallery() {
    
    let slideCounter = document.createElement("div");
    slideCounter.id = "slideCounter";
-   slideCounter.textContent = currentSlide + "/" + imageCount;
+   slideCounter.textContent = currentSlide + "/" + imgCount;
    galleryBox.appendChild(slideCounter);
    
    let leftBox = document.createElement("div");
@@ -109,7 +148,7 @@ function setupGallery() {
    galleryBox.appendChild(slideBox);
    
    
-   for (let i = 0; i < imageCount; i++) {
+   for (let i = 0; i < imgCount; i++) {
       let image = document.createElement("img");
       image.src = imgFiles[i];
       image.alt = imgCaptions[i];
@@ -129,7 +168,7 @@ function setupGallery() {
       if (currentSlide > imageCount) {
          currentSlide = 1;
       }
-      slideCounter.textContent = currentSlide + " / " + imageCount;
+      slideCounter.textContent = currentSlide + " / " + imgCount;
    }
    
    function moveToLeft() {
@@ -139,9 +178,9 @@ function setupGallery() {
       slideBox.insertBefore(lastImage, slideBox.firstElementChild);
       currentSlide--;
       if (currentSlide === 0) {
-         currentSlide = imageCount;
+         currentSlide = imgCount;
       }
-      slideCounter.textContent = currentSlide + " / " + imageCount;      
+      slideCounter.textContent = currentSlide + " / " + imgCount;      
    }  
    
    function startStopShow() {
@@ -178,5 +217,5 @@ function setupGallery() {
       
       document.body.appendChild(modalWindow);
    }
-   
+
 }
